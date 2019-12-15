@@ -24,24 +24,48 @@ function routes(Book) {
       }
     });
 
+  bookRouter.use("/books/:bookId", async (req, res, next) => {
+    try {
+      const book = await Book.findById(req.params.bookId);
+      if (book) {
+        req.book = book;
+        return next();
+      }
+      return res.sendStatus(404);
+    } catch (err) {
+      return res.send(err);
+    }
+  });
   bookRouter
     .route("/books/:bookId")
-    .get(async (req, res) => {
+    .get((req, res) => res.json(req.book))
+    .put(async (req, res) => {
       try {
-        const book = await Book.findById(req.params.bookId);
-        res.json(book);
+        const { book } = req;
+        book.title = req.body.title;
+        book.author = req.body.author;
+        book.genre = req.body.genre;
+        const updatedBook = await book.save();
+        return res.json(updatedBook);
       } catch (err) {
         res.send(err);
       }
     })
-    .put(async (req, res) => {
+    .patch(async (req, res) => {
       try {
-        const book = await Book.findById(req.params.bookId);
-        book.title = req.body.title;
-        book.author = req.body.author;
-        book.genre = req.body.genre;
-        await book.save();
-        return res.json(book);
+        const { book } = req;
+        // eslint-disable-next-line no-underscore-dangle
+        if (req.body._id) {
+          // eslint-disable-next-line no-underscore-dangle
+          delete req.body._id;
+        }
+        Object.entries(req.body).forEach(item => {
+          const key = item[0];
+          const value = item[1];
+          book[key] = value;
+        });
+        const updatedBook = await book.save();
+        return res.json(updatedBook);
       } catch (err) {
         res.send(err);
       }
