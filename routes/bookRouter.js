@@ -69,6 +69,14 @@ function routes(Book) {
       } catch (err) {
         res.send(err);
       }
+    })
+    .delete(async (req, res) => {
+      try {
+        await req.book.remove();
+        return res.sendStatus(204);
+      } catch (err) {
+        return res.send("Not Found");
+      }
     });
 
   return bookRouter;
