@@ -1,13 +1,22 @@
 const express = require("express");
+const mongoose = require("mongoose");
 
 const app = express();
+const db = mongoose.connect("mongodb://localhost/bookAPI", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 const bookRouter = express.Router();
 const port = process.env.PORT || 3000;
+const Book = require("./models/bookModel");
 
-bookRouter.route("/books").get((req, res) => {
-  const response = { shiva: "From Kailash" };
-
-  res.json(response);
+bookRouter.route("/books").get(async (req, res) => {
+  try {
+    const books = await Book.find();
+    res.json(books);
+  } catch (err) {
+    res.send(err);
+  }
 });
 
 app.use("/api", bookRouter);
