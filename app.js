@@ -12,7 +12,11 @@ const Book = require("./models/bookModel");
 
 bookRouter.route("/books").get(async (req, res) => {
   try {
-    const books = await Book.find();
+    const query = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    const books = await Book.find(query);
     res.json(books);
   } catch (err) {
     res.send(err);
