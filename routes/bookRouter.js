@@ -1,28 +1,14 @@
 /* eslint-disable no-param-reassign */
 const express = require("express");
+const booksController = require("../controllers/booksController");
 
 function routes(Book) {
   const bookRouter = express.Router();
+  const controller = booksController(Book);
   bookRouter
     .route("/books")
-    .post(async (req, res) => {
-      const book = new Book(req.body);
-
-      await book.save();
-      return res.status(201).json(book);
-    })
-    .get(async (req, res) => {
-      try {
-        const query = {};
-        if (req.query.genre) {
-          query.genre = req.query.genre;
-        }
-        const books = await Book.find(query);
-        res.json(books);
-      } catch (err) {
-        res.send(err);
-      }
-    });
+    .post(controller.post)
+    .get(controller.get);
 
   bookRouter.use("/books/:bookId", async (req, res, next) => {
     try {
