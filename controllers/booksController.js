@@ -2,8 +2,13 @@ function booksController(Book) {
   async function post(req, res) {
     try {
       const book = new Book(req.body);
+      if (!req.body.title) {
+        res.status(400);
+        return res.send("Title is required");
+      }
       const response = await book.save();
-      return res.status(201).json(response);
+      res.status(201);
+      return res.json(response);
     } catch (err) {
       return res.send(err);
     }
