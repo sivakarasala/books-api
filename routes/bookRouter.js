@@ -24,7 +24,14 @@ function routes(Book) {
   });
   bookRouter
     .route("/books/:bookId")
-    .get((req, res) => res.json(req.book))
+    .get((req, res) => {
+      const returnBook = req.book.toJSON();
+
+      returnBook.links = {};
+      const genre = req.book.genre.replace(" ", "%20");
+      returnBook.links.FilterByThisGenre = `http://${req.headers.host}/api/books/?genre=${genre}`;
+      return res.json(returnBook);
+    })
     .put(async (req, res) => {
       try {
         const { book } = req;
